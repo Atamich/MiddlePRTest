@@ -222,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\nikitaPublish.pubxml" />
     <None Include="Resources\Example.csv" />
     <None Include="Resources\InvoicePreset.pdf" />
   </ItemGroup>

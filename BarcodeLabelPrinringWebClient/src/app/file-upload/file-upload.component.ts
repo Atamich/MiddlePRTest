@@ -31,7 +31,7 @@ export class FileUploadComponent implements OnInit {
   isProcess: boolean = false;
 
   async onClickDownloadPreset(event: any, control: any) {
-     await this.service.donwloadPreset(this.exampleFileRoute, this.exampleFileName);
+     await this.service.donwloadPreset(this.exampleFileRoute, this.exampleFileName, false);
   }
 
   onClickFileInputButton(): void {

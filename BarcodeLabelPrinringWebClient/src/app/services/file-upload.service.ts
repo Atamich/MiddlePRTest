@@ -16,7 +16,6 @@ export class FileUploadService<T = any> {
     let result: ResultModel<T>;
     if (afterDownload) {
       result = await this.api.uploadAndDownload<ResultModel<T>>(route, formData,fileName);
-      console.log('test');
     }
     else {
       result = await this.api.post<ResultModel<T>>(route, formData);
@@ -30,10 +29,10 @@ export class FileUploadService<T = any> {
     this.returnContent = result.content;
   }
 
-  async donwloadPreset(route: string, fileName :string = "") {
+  async donwloadPreset(route: string, fileName :string = "", showFinalComp: boolean = true) {
 
 
-    const result = await this.api.download<ResultModel<T>>(route, fileName);
+    const result = await this.api.download<ResultModel<T>>(route, fileName, showFinalComp);
     
 
     this.returnContent = result.content;

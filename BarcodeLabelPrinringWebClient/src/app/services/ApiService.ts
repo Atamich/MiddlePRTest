@@ -50,20 +50,20 @@ export class ApiService {
     }).catch();
   }
 
-  async download<T>(url: string, name: string) {
+  async download<T>(url: string, name: string, showFinalComp: boolean = true) {
     return new Promise<T>((resolve, reject) => {
       this.http.get(this.baseAddress + url, {
         responseType: "blob"
       }).subscribe(
         response => {
-          this.downloadFile(response, name);
+          this.downloadFile(response, name, showFinalComp);
         },
         error => this.errorHandler(error, reject)
       );
     }).catch();
   }
 
-  private downloadFile(data: any, name: string) {
+  private downloadFile(data: any, name: string, showFinalComp: boolean = true) {
     const downloadedFile = new Blob([data], { type: data.type });
     const a = document.createElement('a');
     a.setAttribute('style', 'display:none;');
@@ -73,7 +73,8 @@ export class ApiService {
     a.target = '_blank';
     a.click();
     document.body.removeChild(a);
-    this.router.navigateByUrl("final");
+    if(showFinalComp) 
+      this.router.navigateByUrl("final");
   }
 
   getOptions() {

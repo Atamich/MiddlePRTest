@@ -15,10 +15,10 @@ using System.Web.Mvc;
 
 namespace BarcodeLabelPrinting.Controllers
 {
-    [RoutePrefix("api")]
+    [RoutePrefix("upload")]
     public class UploadTableController : Controller
     {
-        [Route("uploadtable")]
+        [Route("table")]
         [HttpPost]
         public ActionResult GetInvoices()
         {

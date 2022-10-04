@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod --output-path=\"C:/Users/%username%/Desktop/BarcodeLabelPrintingBuild\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
