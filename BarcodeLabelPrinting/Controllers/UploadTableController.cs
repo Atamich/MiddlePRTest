@@ -15,7 +15,9 @@ using System.Web.Mvc;
 
 namespace BarcodeLabelPrinting.Controllers
 {
-    [RoutePrefix("upload")]
+    //[RoutePrefix("upload")]
+    [RoutePrefix("api/upload")]
+    [Authorize]
     public class UploadTableController : Controller
     {
         [Route("table")]
@@ -23,13 +25,16 @@ namespace BarcodeLabelPrinting.Controllers
         public ActionResult GetInvoices()
         {
             HttpFileCollectionBase files = Request.Files;
+            var underInvoiceText = Request.Form.Get("underInvoiceText");
             try
             {
                 if (!InputTableRow.TryParseHttpFiles(files, out var orders))
                     Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
 
 
-                List<IFile> responseFiles = new List<IFile> { new InvoicePdf(orders), new LabelsPdf(orders) };
+                List<IFile> responseFiles = new List<IFile>();
+                responseFiles.AddRange(InvoicePdf.GetInvoiceFiles(orders, underInvoiceText));
+                responseFiles.AddRange(LabelsPdf.GetLabelsFiles(orders));
 
                 using (var compressedFileStream = new MemoryStream())
                 {

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ResultModel } from '../models/ResultModel';
 import { ApiService } from "./ApiService";
 
@@ -10,9 +11,14 @@ export class FileUploadService<T = any> {
   public returnContent: T;
   constructor(private api: ApiService) { }
 
-  async uploadFile(file: File, route: string, afterDownload: boolean = false, fileName :string = "") {
+  async uploadFile(file: File, route: string, afterDownload: boolean = false, fileName :string = "", additionalFormData : AdditionalFormData[] = []){
     const formData = new FormData();
     formData.append(file.name, file);
+
+    additionalFormData.forEach(element => {
+      formData.append(element.name, element.value);
+    });
+    
     let result: ResultModel<T>;
     if (afterDownload) {
       result = await this.api.uploadAndDownload<ResultModel<T>>(route, formData,fileName);
@@ -37,4 +43,8 @@ export class FileUploadService<T = any> {
 
     this.returnContent = result.content;
   }
+}
+export interface AdditionalFormData{
+  name: string;
+  value: string;
 }

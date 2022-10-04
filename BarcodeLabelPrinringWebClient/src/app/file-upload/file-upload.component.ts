@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
 import { filter } from 'rxjs';
-import { FileUploadService } from '../services/file-upload.service';
+import { AdditionalFormData, FileUploadService } from '../services/file-upload.service';
+import { SettingsService } from '../services/setting.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -50,13 +51,17 @@ export class FileUploadComponent implements OnInit {
   }
 
   async uploadFile() {
-    await this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName);
+    let settings = this.settingsService.getSettings();
+    let additionalFormData = {} as AdditionalFormData;
+    additionalFormData.name = "underInvoiceText"
+    additionalFormData.value = settings.underInvoiceText;
+    await this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName,[additionalFormData]);
   }
 
-  constructor(public service: FileUploadService) { }
+  constructor(public service: FileUploadService,private settingsService: SettingsService) { }
 
   async ngOnInit() {
-
+    
   }
 
 }

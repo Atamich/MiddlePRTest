@@ -3,6 +3,4 @@
 
 4. Посмотреть библиотеку MigraDoc / Переписать генерацию накладной
 
-
-
 "Source Sans Pro", Arial, sans-serif

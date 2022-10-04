@@ -24,5 +24,11 @@ namespace BarcodeLabelPrinting.Extensions
 
 			return list;
 		}
+
+		public static List<string> NewLinesToList(this string text)
+		{
+			text = text.Replace("\r", String.Empty);
+			return text.Split("\n".ToCharArray()).ToList();
+		}
 	}
 }

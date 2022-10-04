@@ -37,7 +37,7 @@
 }
 
 .loader-wheel {
-    animation: b2bspin 1s infinite linear;
+    animation: spin 1s infinite linear;
     border: 2px solid rgba(30, 30, 30, 0.5);
     border-left: 4px solid #fff;
     border-radius: 50%;
@@ -47,7 +47,7 @@
     margin-left: 50px;
 }
 
-@keyframes b2bspin {
+@keyframes spin {
     0% {
         transform: rotate(0deg);
     }

@@ -7,6 +7,6 @@
 <form class="form full-width full-height">
     <mat-form-field  appearance="fill">
       <mat-label>Текст для накладной</mat-label>
-      <textarea matInput placeholder="Текст"></textarea>
+      <textarea matInput placeholder="Текст" [(ngModel)]="underInvoiceText" name="underInvoiceText" (change)="onChaged($event)"></textarea>
     </mat-form-field>
   </form>

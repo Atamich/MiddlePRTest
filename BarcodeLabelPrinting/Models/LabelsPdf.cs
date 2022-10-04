@@ -26,57 +26,53 @@ namespace BarcodeLabelPrinting.Models
 
 		const double labelHeightCm = 7; //Размеры в сантиметрах
 		const double labelWIdthCm = 10;
-
+		const double marginBase = 15;
 		const double marginHorizntalCm = 0.3;
 		const double marginVerticalCm = 0.6;
 
-		const int labelsOnRow = 2; //Кол-во на одной строке
-		const int rowsOnPage = 2; //Кол-во на одной странице
+		const int labelsOnRow = 1; //Кол-во на одной строке
+		const int rowsOnPage = 3; //Кол-во на одной странице
 
 		private LabelsPdf() { }
 
-		public LabelsPdf(List<Order> orders)
+		public LabelsPdf(Order order)
 		{
 			PdfDocument labelDoc = new PdfDocument();
-			foreach (var order in orders)
+			PdfPage currentPage = labelDoc.AddPage();
+			XGraphics gfx = XGraphics.FromPdfPage(currentPage);
+
+			int w = 0, h = 0;
+			for (int i = 0; i < order.Items.Count; i++)
 			{
-				PdfPage currentPage = labelDoc.AddPage();
-				XGraphics gfx = XGraphics.FromPdfPage(currentPage);
+				var orderItem = order.Items[i];
+				DrawLabel(gfx, new XRect(
+					marginBase + (w * (marginHorizntalCm * cmToPoint)) + (w * (labelWIdthCm * cmToPoint)), // позиция по горизонтали высчитывается тз текущего столбца - w, размера оступов, и наклеек
+					marginBase + (h * (marginVerticalCm * cmToPoint)) + h * (labelHeightCm * cmToPoint), // Аналогично горизонтали высчитывается вертикальная позиция
+					labelWIdthCm * cmToPoint,
+					labelHeightCm * cmToPoint
+					), orderItem, order);
 
-				int w = 0, h = 0;
-				for (int i = 0; i < order.Items.Count; i++)
+				//5 это отступ от начала страницы,
+				//w - текущий столбец,
+				//h - текущая строка,
+				//marginCm - отступ между,
+				//labelCm - Размер наклейки
+
+				w++;
+
+				if (i != 0 && i % labelsOnRow - 1 == 0 || labelsOnRow == 1) // new row
 				{
-					var orderItem = order.Items[i];
-					DrawLabel(gfx, new XRect(
-						5+(w * (marginHorizntalCm * cmToPoint)) + (w * (labelWIdthCm * cmToPoint)), // позиция по горизонтали высчитывается тз текущего столбца - w, размера оступов, и наклеек
-						5+(h * (marginVerticalCm * cmToPoint)) + h * (labelHeightCm * cmToPoint), // Аналогично горизонтали высчитывается вертикальная позиция
-						labelWIdthCm * cmToPoint,
-						labelHeightCm * cmToPoint
-						), orderItem, order);
-
-					//5 это отступ от начала страницы,
-					//w - текущий столбец,
-					//h - текущая строка,
-					//marginCm - отступ между,
-					//labelCm - Размер наклейки
-
-					w++;
-
-					if (i != 0 && i % labelsOnRow - 1 == 0) // new row
-					{
-						w = 0;
-						h++;
-					}
-					if (h != 0 && h % rowsOnPage == 0 && i != order.Items.Count-1) //new page
-					{
-						w = 0;
-						h = 0;
-
-						currentPage = labelDoc.AddPage();
-						gfx = XGraphics.FromPdfPage(currentPage);
-					}
+					w = 0;
+					h++;
 				}
+				if (h != 0 && h % rowsOnPage == 0 && i != order.Items.Count - 1) //new page
+				{
+					w = 0;
+					h = 0;
 
+					currentPage = labelDoc.AddPage();
+					gfx = XGraphics.FromPdfPage(currentPage);
+				}
 			}
 
 			using (var outputStream = new MemoryStream())
@@ -86,6 +82,17 @@ namespace BarcodeLabelPrinting.Models
 			}
 		}
 
+		public static List<IFile> GetLabelsFiles(List<Order> orders)
+		{
+			var list = new List<IFile>();
+			foreach (var order in orders)
+			{
+				var file = new LabelsPdf(order);
+				file.FileName = $"{order.AddresseesContact}_{order.BillId}/Labels_{order.BillId}.pdf";
+				list.Add(file);
+			}
+			return list;
+		}
 		private void DrawLabel(XGraphics gfx, XRect rect, OrderItem orderItem, Order order)
 		{
 			gfx.DrawRectangle(pen, rect);
@@ -94,7 +101,7 @@ namespace BarcodeLabelPrinting.Models
 			var rowSize = rect.Height / 10;
 
 			gfx.DrawString(order.AddresseesContact.ToUpper(), font, XBrushes.Black, marginLeft, rect.Y + rowSize * 2);
-			gfx.DrawWrappedString(order.AddresseesAddress.ToUpper(), marginLeft, rect.Y + rowSize * 3,60, font);
+			gfx.DrawString(order.AddresseesAddress.ToUpper().WordWrap(60),font,XBrushes.Black, marginLeft, rect.Y + rowSize * 3);
 
 			gfx.DrawString("Тел.: " + order.AddresseesTelephoneNumber, font, XBrushes.Black, marginLeft, rect.Y + rowSize * 5);
 			gfx.DrawString("La Redoute", font, XBrushes.Black, marginLeft, rect.Y + rowSize * 6);

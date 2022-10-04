@@ -21,88 +21,107 @@ namespace BarcodeLabelPrinting.Models
         public byte[] FileBytes { get; private set; }
         public string FileName { get; set; } = "Invoice.pdf";
 
-		readonly int[] colPositionsX = { 25, 120, 160, 215, 282, 340, 370 };
+		readonly int[] colPositionsX = { 45, 140, 176, 230, 298, 358, 386 };
 
-        const int StartY = 160;
+        const int StartY = 180;
         const int rowSize = 10;
         const int rowMargTop = 5;
 		const int totalRecordsOnPage = 20;
-        readonly XFont font = new XFont("Segoe WP", 7);
+        readonly XFont fontSmall = new XFont("Segoe WP", 7);
+        readonly XFont fontMedium = new XFont("Segoe WP", 9);
 
         private InvoicePdf() { }
 
-        public InvoicePdf(List<Order> orders)
-        {
-            PdfDocument invoiceDoc = new PdfDocument();
-			foreach (var order in orders)
+		public InvoicePdf(Order order,string underInvoiceText)
+		{
+			PdfDocument invoiceDoc = new PdfDocument();
+			PdfPage presetPage = GetInvoicePreset();
+			invoiceDoc.AddPage(presetPage);
+			PdfPage currentPage = invoiceDoc.Pages[invoiceDoc.PageCount - 1];
+			XGraphics gfx = XGraphics.FromPdfPage(currentPage);
+
+			DrawOrderInfo(gfx, order, underInvoiceText);
+
+			int y = StartY;
+
+			for (int i = 0; i < order.Items.Count; i++)
 			{
-				PdfPage presetPage = GetInvoicePreset();
-				invoiceDoc.AddPage(presetPage);
-				PdfPage currentPage = invoiceDoc.Pages[invoiceDoc.PageCount-1];
-				XGraphics gfx = XGraphics.FromPdfPage(currentPage);
-				DrawOrderInfo(gfx, order);
+				var orderItem = order.Items[i];
 
-
-				int y = StartY;
-
-				for (int i = 0; i < order.Items.Count; i++)
+				int xi = 0;
+				int biggestPropRow = 1;
+				foreach (var propItem in orderItem) // Отрисовка в разных позициях, реализация колонок
 				{
-					var orderItem = order.Items[i];
+					var list = propItem.WordWrap(25);
+					if (list.Count > biggestPropRow) biggestPropRow = list.Count;
 
-					int xi = 0;
-					int biggestPropRow = 1;
-					foreach (var propItem in orderItem) // Отрисовка в разных позициях, реализация колонок
+					for (int pr = 0; pr < list.Count; pr++)
 					{
-						var list = propItem.WordWrap(25);
-						if (list.Count > biggestPropRow) biggestPropRow = list.Count;
-
-						for (int pr = 0; pr < list.Count; pr++)
-						{
-							gfx.DrawString(list[pr], font, XBrushes.Black,
-							colPositionsX[xi],
-							y+(pr*rowSize)+rowMargTop*i);
-						}
-						xi++;
+						gfx.DrawString(list[pr], fontSmall, XBrushes.Black,
+						colPositionsX[xi],
+						y + (pr * rowSize) + rowMargTop * i);
 					}
+					xi++;
+				}
 
-					y += rowSize* biggestPropRow;
+				y += rowSize * biggestPropRow;
 
-					if (i != 0 && i % totalRecordsOnPage == 0) //every 20 record adds new page
-					{
-						y = StartY;
+				if (i != 0 && i % totalRecordsOnPage == 0) //every 20 record adds new page
+				{
+					y = StartY;
 
-						invoiceDoc.AddPage(presetPage);
-						currentPage = invoiceDoc.Pages[invoiceDoc.PageCount];
-						gfx = XGraphics.FromPdfPage(currentPage);
-						DrawOrderInfo(gfx, order);
+					invoiceDoc.AddPage(presetPage);
+					currentPage = invoiceDoc.Pages[invoiceDoc.PageCount];
+					gfx = XGraphics.FromPdfPage(currentPage);
+					DrawOrderInfo(gfx, order, underInvoiceText);
 
-					}
 				}
 			}
 
-            using (var outputStream = new MemoryStream())
-            {
-                invoiceDoc.Save(outputStream);
-                FileBytes = outputStream.ToArray();
-            }
-        }
 
-		private void DrawOrderInfo(XGraphics gfx, Order order)
+			using (var outputStream = new MemoryStream())
+			{
+				invoiceDoc.Save(outputStream);
+				FileBytes = outputStream.ToArray();
+			}
+		}
+
+		public static List<IFile> GetInvoiceFiles(List<Order> orders, string underInvoiceText)
 		{
-			gfx.DrawWrappedString(order.AddresseesAddress,14,48,25,font);
+			var list = new List<IFile>();
+			foreach (var order in orders)
+			{
+				var file = new InvoicePdf(order, underInvoiceText);
+				file.FileName = $"{order.AddresseesContact}_{order.BillId}/Invoice_{order.BillId}.pdf";
+				list.Add(file);
+			}
+			return list;
+		}
 
-			gfx.DrawString(order.ClientId.ToString(), font, XBrushes.Black, 350, 45);
-			gfx.DrawString(order.OrderId.ToString(), font, XBrushes.Black, 350, 55);
-			gfx.DrawString(order.Date.ToString("d"), font, XBrushes.Black, 350, 65);
-			gfx.DrawString(order.ParcelId, font, XBrushes.Black, 350, 75);
-			gfx.DrawString(order.BillType, font, XBrushes.Black, 350, 85);
-			gfx.DrawString(order.CurrencyType, font, XBrushes.Black, 350, 95);
+		private void DrawOrderInfo(XGraphics gfx, Order order, string underInvoiceText)
+		{
+			gfx.DrawString(underInvoiceText.NewLinesToList(), fontMedium, XBrushes.Black, 30, 380, 9);
+			//double y = 380;
+			//foreach (var str in underInvoiceText.NewLinesToList())
+			//{
+			//	y = gfx.DrawString(str.WordWrap(35), fontMedium, XBrushes.Black, 30, y,10);
+			//}
+			
 
-			gfx.DrawString(order.TotalPrice.ToString("0.##"), font, XBrushes.Black, 365, 336);
-			gfx.DrawString(order.ServiceFee.ToString(), font, XBrushes.Black, 365, 346);
+			gfx.DrawString(order.AddresseesAddress.WordWrap(25), fontSmall, XBrushes.Black, 30, 68);
 
-			gfx.DrawString(order.TotalPrice.ToString("0.##"), font, XBrushes.Black, 365, 396);
-			gfx.DrawString(order.Nds.ToString(), font, XBrushes.Black, 365, 407);
+			gfx.DrawString(order.ClientId.ToString(), fontSmall, XBrushes.Black, 366, 65);
+			gfx.DrawString(order.OrderId.ToString(), fontSmall, XBrushes.Black, 366, 75);
+			gfx.DrawString(order.Date.ToString("d"), fontSmall, XBrushes.Black, 366, 85);
+			gfx.DrawString(order.ParcelId, fontSmall, XBrushes.Black, 366, 95);
+			gfx.DrawString(order.BillType, fontSmall, XBrushes.Black, 366, 105);
+			gfx.DrawString(order.CurrencyType, fontSmall, XBrushes.Black, 366, 115);
+
+			gfx.DrawString(order.TotalPrice.ToString("0.##"), fontSmall, XBrushes.Black, 381, 358);
+			gfx.DrawString(order.ServiceFee.ToString(), fontSmall, XBrushes.Black, 381, 368);
+
+			gfx.DrawString(order.TotalPrice.ToString("0.##"), fontSmall, XBrushes.Black, 381, 418);
+			gfx.DrawString(order.Nds.ToString(), fontSmall, XBrushes.Black, 381, 429);
 		}
 
 		private static PdfPage GetInvoicePreset()
