@@ -97,7 +97,7 @@ namespace BarcodeLabelPrinting.Models
 					orderItem.Ean = item.ItemEan;
 					orderItem.Size = item.ItemSize;
 					orderItem.Count = item.ItemCount;
-					orderItem.TotalPrice = item.ItemPrice * item.ItemCount * order.Nds;
+					orderItem.TotalPrice = item.ItemPrice * item.ItemCount * (order.Nds/100+1);
 
 					order.Items.Add(orderItem);
 				}

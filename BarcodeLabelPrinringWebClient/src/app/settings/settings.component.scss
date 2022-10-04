@@ -1,0 +1,12 @@
+:host{
+    height: 730px;
+    display: flex;
+    flex-direction: column;
+}
+.form mat-form-field{
+    min-width: 400px;
+    min-height: 300px;
+}
+.form textarea{
+    min-height: 300px;
+}

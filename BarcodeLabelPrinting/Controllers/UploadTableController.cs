@@ -16,7 +16,6 @@ using System.Web.Mvc;
 namespace BarcodeLabelPrinting.Controllers
 {
 	[RoutePrefix("upload")]
-	//[RoutePrefix("api/upload")]
 	[Authorize]
     public class UploadTableController : Controller
     {

@@ -21,7 +21,7 @@ namespace BarcodeLabelPrinting.Models
         public byte[] FileBytes { get; private set; }
         public string FileName { get; set; } = "Invoice.pdf";
 
-		readonly int[] colPositionsX = { 45, 140, 176, 230, 298, 358, 386 };
+		readonly int[] colPositionsX = { 45, 135, 176, 230, 298, 358, 386 };
 
         const int StartY = 180;
         const int rowSize = 10;
@@ -121,7 +121,7 @@ namespace BarcodeLabelPrinting.Models
 			gfx.DrawString(order.ServiceFee.ToString(), fontSmall, XBrushes.Black, 381, 368);
 
 			gfx.DrawString(order.TotalPrice.ToString("0.##"), fontSmall, XBrushes.Black, 381, 418);
-			gfx.DrawString(order.Nds.ToString(), fontSmall, XBrushes.Black, 381, 429);
+			gfx.DrawString(order.Nds.ToString() + "%", fontSmall, XBrushes.Black, 381, 429);
 		}
 
 		private static PdfPage GetInvoicePreset()
