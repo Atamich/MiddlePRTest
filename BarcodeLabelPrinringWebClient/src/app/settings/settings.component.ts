@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ILabelPrintSettings, SettingsService, } from '../services/setting.service';
+import {HeaderTitleService} from '../services/HeaderTitleService';
 
 @Component({
   selector: 'app-settings',
@@ -18,9 +19,13 @@ export class SettingsComponent implements OnInit {
   'согласовывается после оформления заявки на\r\n'+
   'возврат и оплаты забора товара.';
 
-    constructor(private service: SettingsService) { 
+  private headerTitleService: HeaderTitleService;
+
+    constructor(private service: SettingsService, private _headerTitleService: HeaderTitleService) { 
     let settings = service.getSettings();
-    this.underInvoiceText = settings.underInvoiceText
+    this.underInvoiceText = settings.underInvoiceText;
+    this.headerTitleService = _headerTitleService;
+    this.headerTitleService.updateTitle("Печать этикеток - Настройки");
   }
 
   ngOnInit(): void {
@@ -30,5 +35,9 @@ export class SettingsComponent implements OnInit {
     let settings = {} as ILabelPrintSettings;
     settings.underInvoiceText = event.target.value;
     this.service.setSettings(settings)
+  }
+
+  goBack (){
+    this.headerTitleService.updateTitle("Печать этикеток");
   }
 }

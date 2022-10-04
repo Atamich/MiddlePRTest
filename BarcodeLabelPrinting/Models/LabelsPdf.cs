@@ -18,10 +18,6 @@ namespace BarcodeLabelPrinting.Models
 		public byte[] FileBytes { get; private set; }
 		public string FileName { get; set; } = "Labels.pdf";
 
-		readonly XFont font = new XFont("Segoe WP", 8, XFontStyle.Bold);
-
-		readonly XPen pen = new XPen(XColor.FromGrayScale(0.5), 0.5);
-
 		const double cmToPoint = 28.3465; //Конф. сантиметров к поинтам
 
 		const double labelHeightCm = 7; //Размеры в сантиметрах
@@ -35,9 +31,44 @@ namespace BarcodeLabelPrinting.Models
 
 		private LabelsPdf() { }
 
-		public LabelsPdf(Order order)
+		public LabelsPdf(Order order, XFont font ,XPen pen)
 		{
 			PdfDocument labelDoc = new PdfDocument();
+			DrawDocument(order, labelDoc, font, pen);
+
+
+			using (var outputStream = new MemoryStream())
+			{
+				labelDoc.Save(outputStream);
+				FileBytes = outputStream.ToArray();
+				labelDoc.Close();
+				labelDoc.Dispose();
+				outputStream.Flush();
+				outputStream.Close();
+				outputStream.Dispose();
+			}
+		}
+		public LabelsPdf(List<Order> orders, XFont font, XPen pen)
+		{
+			PdfDocument labelDoc = new PdfDocument();
+			foreach (var order in orders)
+				DrawDocument(order, labelDoc, font, pen);
+
+
+			using (var outputStream = new MemoryStream())
+			{
+				labelDoc.Save(outputStream);
+				FileBytes = outputStream.ToArray();
+				labelDoc.Close();
+				labelDoc.Dispose();
+				outputStream.Flush();
+				outputStream.Close();
+				outputStream.Dispose();
+			}
+		}
+
+		private void DrawDocument(Order order, PdfDocument labelDoc, XFont font, XPen pen)
+		{
 			PdfPage currentPage = labelDoc.AddPage();
 			XGraphics gfx = XGraphics.FromPdfPage(currentPage);
 
@@ -50,7 +81,7 @@ namespace BarcodeLabelPrinting.Models
 					marginBase + (h * (marginVerticalCm * cmToPoint)) + h * (labelHeightCm * cmToPoint), // Аналогично горизонтали высчитывается вертикальная позиция
 					labelWIdthCm * cmToPoint,
 					labelHeightCm * cmToPoint
-					), orderItem, order);
+					), orderItem, order, font, pen);
 
 				//5 это отступ от начала страницы,
 				//w - текущий столбец,
@@ -74,26 +105,46 @@ namespace BarcodeLabelPrinting.Models
 					gfx = XGraphics.FromPdfPage(currentPage);
 				}
 			}
-
-			using (var outputStream = new MemoryStream())
-			{
-				labelDoc.Save(outputStream);
-				FileBytes = outputStream.ToArray();
-			}
 		}
 
-		public static List<IFile> GetLabelsFiles(List<Order> orders)
+		public static List<string> SaveLabelsToTempFolder(List<Order> orders, string tempFolderPath, bool mergeFiles)
 		{
-			var list = new List<IFile>();
-			foreach (var order in orders)
+			var list = new List<string>();
+			XFont font = new XFont("Segoe WP", 8, XFontStyle.Bold);
+			XPen pen = new XPen(XColor.FromGrayScale(0.5), 0.5);
+			if (mergeFiles)
 			{
-				var file = new LabelsPdf(order);
-				file.FileName = $"{order.AddresseesContact}_{order.BillId}/Labels_{order.BillId}.pdf";
-				list.Add(file);
+				using (var file = new LabelsPdf(orders, font, pen))
+				{
+					Directory.CreateDirectory($@"{tempFolderPath}/");
+					file.FileName = $"{tempFolderPath}/Labels.pdf";
+					File.WriteAllBytes(file.FileName, file.FileBytes);
+
+					list.Add(file.FileName);
+				}
+
+				GC.Collect();
+			}
+			else
+			{
+				foreach (var order in orders)
+				{
+					using (var file = new LabelsPdf(order, font, pen))
+					{
+						Directory.CreateDirectory($@"{tempFolderPath}/{order.AddresseesContact}_{order.BillId}/");
+						file.FileName = $"{tempFolderPath}/{order.AddresseesContact}_{order.BillId}/Labels_{order.BillId}.pdf";
+
+						File.WriteAllBytes(file.FileName, file.FileBytes);
+						list.Add(file.FileName);
+					}
+
+					GC.Collect();
+				}
 			}
 			return list;
 		}
-		private void DrawLabel(XGraphics gfx, XRect rect, OrderItem orderItem, Order order)
+
+		private void DrawLabel(XGraphics gfx, XRect rect, OrderItem orderItem, Order order,XFont font, XPen pen)
 		{
 			gfx.DrawRectangle(pen, rect);
 
@@ -106,7 +157,7 @@ namespace BarcodeLabelPrinting.Models
 			gfx.DrawString("Тел.: " + order.AddresseesTelephoneNumber, font, XBrushes.Black, marginLeft, rect.Y + rowSize * 5);
 			gfx.DrawString("La Redoute", font, XBrushes.Black, marginLeft, rect.Y + rowSize * 6);
 
-			gfx.DrawString("PEC", font, XBrushes.Black, marginLeft, rect.Y + rowSize * 8);
+			gfx.DrawString(order.Carrier, font, XBrushes.Black, marginLeft, rect.Y + rowSize * 8);
 			gfx.DrawString("EAN " + orderItem.Ean, font, XBrushes.Black, marginLeft, rect.Y + rowSize * 9);
 
 
@@ -114,8 +165,11 @@ namespace BarcodeLabelPrinting.Models
 			barcode.TextLocation = TextLocation.Below;
 
 			gfx.DrawBarCode(barcode, XBrushes.Black, font, new XPoint(rect.X + 5 * cmToPoint, rect.Y + rowSize * 5));
+		}
 
-			//gfx.DrawString(orderItem.Ean.ToString(), font, XBrushes.Black,  barcode.Size.Width / 2 - gfx.MeasureString(orderItem.Ean.ToString(), font).Width / 2, rect.Y + rowSize * .2 +);
+		public void Dispose()
+		{
+			FileBytes = null;
 		}
 	}
 }

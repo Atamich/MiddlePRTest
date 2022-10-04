@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {HeaderTitleService} from '../services/HeaderTitleService';
 
 @Component({
   selector: 'app-header',
@@ -7,7 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
 
-  constructor() { }
+  title = "Печать этикеток"
+  
+  constructor(private headerTitleService: HeaderTitleService) { 
+
+    this.headerTitleService.resultList$
+    .subscribe((newTitle) => {
+      this.title = newTitle;
+    });
+  }
 
   ngOnInit(): void {
   }

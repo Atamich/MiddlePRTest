@@ -1,5 +1,8 @@
 import { Component, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+
 import { filter } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { AdditionalFormData, FileUploadService } from '../services/file-upload.service';
 import { SettingsService } from '../services/setting.service';
 
@@ -18,22 +21,17 @@ export class FileUploadComponent implements OnInit {
   @Input() buttonText: string
   @Input() filter: string = "*";
   @Input() route: string;
-  @Input() exampleFileRoute: string;
   afterDownload: boolean = true;
   @Input() fileName: string = ""
-  @Input() exampleFileName: string = ""
-  // @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>()
+
   path = '';
+  mergeFiles = false;
   @ViewChild('fileInput')
   fileInput: ElementRef;
 
   file: File;
 
-  isProcess: boolean = false;
-
-  async onClickDownloadPreset(event: any, control: any) {
-     await this.service.donwloadPreset(this.exampleFileRoute, this.exampleFileName, false);
-  }
+  InProgress: boolean = false;
 
   onClickFileInputButton(): void {
     this.fileInput.nativeElement.click();
@@ -51,17 +49,35 @@ export class FileUploadComponent implements OnInit {
   }
 
   async uploadFile() {
+    this.InProgress = true;
     let settings = this.settingsService.getSettings();
-    let additionalFormData = {} as AdditionalFormData;
-    additionalFormData.name = "underInvoiceText"
-    additionalFormData.value = settings.underInvoiceText;
-    await this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName,[additionalFormData]);
+    let underInvoiceTextFormData = {} as AdditionalFormData;
+    underInvoiceTextFormData.name = "underInvoiceText"
+    underInvoiceTextFormData.value = settings.underInvoiceText;
+
+    let mergeFilesFormData = {} as AdditionalFormData;
+    mergeFilesFormData.name = "mergeFiles";
+    mergeFilesFormData.value = String(this.mergeFiles);
+
+
+    var promise = this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName, [underInvoiceTextFormData, mergeFilesFormData]);
+
+    promise.catch(() => {
+      this.InProgress = false;
+    });
+
+    promise.then(()=>{
+      this.router.navigateByUrl("final");
+    });
+    
+    
+
   }
 
-  constructor(public service: FileUploadService,private settingsService: SettingsService) { }
+  constructor(public service: FileUploadService, private settingsService: SettingsService, private router: Router, private dialog: MatDialog) { }
 
   async ngOnInit() {
-    
+
   }
 
 }

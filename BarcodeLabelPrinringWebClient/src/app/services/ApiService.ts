@@ -1,8 +1,9 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { LiteEvent } from './LiteEvent';
+import { ErrorComponent } from '../error-component/error-component.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable({
   providedIn: "root"
@@ -13,7 +14,7 @@ export class ApiService {
 
   authError: LiteEvent<ApiService> = new LiteEvent<ApiService>();
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private dialog: MatDialog) { }
 
   setToken(token: string) {
     this.token = token;
@@ -38,8 +39,25 @@ export class ApiService {
   }
 
   async uploadAndDownload<T>(url: string, body: any, name: string) {
-    return new Promise<T>((resolve, reject) => {
+    return new Promise<T | null>((resolve, reject) => {
       this.http.post(this.baseAddress + url, body, {
+        responseType: "blob"
+      }).subscribe(
+        response => {
+          resolve(null);
+          this.downloadFile(response, name);
+        },
+        error => {
+          this.dialog.open(ErrorComponent, { data: { message: error.error } });
+          reject(error);
+        }
+      );
+    }).catch();
+  }
+
+  async download<T>(url: string, name: string) {
+    return new Promise<T>((resolve, reject) => {
+      this.http.get(this.baseAddress + url, {
         responseType: "blob"
       }).subscribe(
         response => {
@@ -50,20 +68,7 @@ export class ApiService {
     }).catch();
   }
 
-  async download<T>(url: string, name: string, showFinalComp: boolean = true) {
-    return new Promise<T>((resolve, reject) => {
-      this.http.get(this.baseAddress + url, {
-        responseType: "blob"
-      }).subscribe(
-        response => {
-          this.downloadFile(response, name, showFinalComp);
-        },
-        error => this.errorHandler(error, reject)
-      );
-    }).catch();
-  }
-
-  private downloadFile(data: any, name: string, showFinalComp: boolean = true) {
+  private downloadFile(data: any, name: string) {
     const downloadedFile = new Blob([data], { type: data.type });
     const a = document.createElement('a');
     a.setAttribute('style', 'display:none;');
@@ -73,8 +78,6 @@ export class ApiService {
     a.target = '_blank';
     a.click();
     document.body.removeChild(a);
-    if(showFinalComp) 
-      this.router.navigateByUrl("final");
   }
 
   getOptions() {
@@ -82,8 +85,6 @@ export class ApiService {
       headers: new HttpHeaders().set("Authorization", "Bearer " + this.token)
     };
   }
-
-
 
   put<T>(url: string, body: any): Promise<T> {
     return new Promise<T>((resolve, reject) => {

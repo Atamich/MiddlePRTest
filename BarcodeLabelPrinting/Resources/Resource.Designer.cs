@@ -61,20 +61,6 @@ namespace BarcodeLabelPrinting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name,Article,Ean,Size,Price,Count,TotalPrice
-        ///Табуретка, 111111, 122464576, единный размер, 2000.30, 3
-        ///Шапка, 222222, 7345623423, единный размер, 2000.30, 3
-        ///Сапоги, 333333, 12333333376, 48-50, 2500.30, 3
-        ///
-        ///.
-        /// </summary>
-        public static string Example {
-            get {
-                return ResourceManager.GetString("Example", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         public static byte[] InvoicePreset {

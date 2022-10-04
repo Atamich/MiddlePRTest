@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BarcodeLabelPrinting.Interfaces
 {
-	public interface IFile
+	public interface IFile : IDisposable
 	{
 		byte[] FileBytes { get; }
 		string FileName { get; set; }

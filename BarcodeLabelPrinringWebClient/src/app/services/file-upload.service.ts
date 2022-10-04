@@ -19,28 +19,25 @@ export class FileUploadService<T = any> {
       formData.append(element.name, element.value);
     });
     
-    let result: ResultModel<T>;
+    let result : ResultModel<T>;
     if (afterDownload) {
-      result = await this.api.uploadAndDownload<ResultModel<T>>(route, formData,fileName);
+      result = await this.api.uploadAndDownload<ResultModel<T | null>>(route, formData,fileName) as ResultModel<T>;
     }
     else {
       result = await this.api.post<ResultModel<T>>(route, formData);
     }
 
-
-    if (!result.isSuccess) {
-      //this.notifier.error(result.errorMessage); on error alarm
+    if (result ==null || !result.isSuccess) {
       return;
     }
+    
     this.returnContent = result.content;
+    return this.returnContent;
   }
 
-  async donwloadPreset(route: string, fileName :string = "", showFinalComp: boolean = true) {
-
-
-    const result = await this.api.download<ResultModel<T>>(route, fileName, showFinalComp);
+  async donwloadPreset(route: string, fileName :string = "") {
+    const result = await this.api.download<ResultModel<T>>(route, fileName);
     
-
     this.returnContent = result.content;
   }
 }

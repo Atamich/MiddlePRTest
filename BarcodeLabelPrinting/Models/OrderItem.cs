@@ -16,8 +16,8 @@ namespace BarcodeLabelPrinting.Models
 		public long Ean { get; set; }
 		public string Size { get; set; }
 		public double Price { get; set; }
-		public int Count { get; set; }
-		public double TotalPrice { get; set; }
+		public string Count { get; set; }
+		public double ItemDAD { get; set; }
 
 		public IEnumerator<string> GetEnumerator()
 		{
@@ -27,7 +27,7 @@ namespace BarcodeLabelPrinting.Models
 			yield return Size;
 			yield return Price.ToString("0.##");
 			yield return Count.ToString();
-			yield return TotalPrice.ToString("0.##");
+			yield return ItemDAD.ToString("0.##");
 		}
 	}
 }

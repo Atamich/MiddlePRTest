@@ -20,7 +20,7 @@ namespace BarcodeLabelPrinting.Models
 		public long BillId { get; set; }
 		public string BillType { get; set; }
 		public string CurrencyType { get; set; }
-		public double TotalPrice => Items.Sum(i=>i.TotalPrice);
+		public double TotalPrice => Items.Sum(i=>i.ItemDAD);
 		public double Nds { get; set; }
 		public double ServiceFee { get; set; }
 	}

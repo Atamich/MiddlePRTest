@@ -5,6 +5,9 @@ using System.Web;
 using System.IO;
 using CsvHelper;
 using System.Globalization;
+using System.Text;
+using CsvHelper.Configuration;
+using System.Configuration;
 
 namespace BarcodeLabelPrinting.Models
 {
@@ -29,15 +32,14 @@ namespace BarcodeLabelPrinting.Models
 		public long ItemEan { get; set; }
 		public string ItemSize { get; set; }
 		public double ItemPrice { get; set; }
-		public int ItemCount { get; set; }
+		public string ItemCount { get; set; }
 		public double ServiceFee { get; set; }
+		public double ItemDAD { get; set; }
 
 		public static bool TryParseHttpFiles(HttpFileCollectionBase files, out List<Order> orders)
 		{
 			var rows = new List<InputTableRow>();
 			orders = null;
-			try
-			{
 				if (files.Count < 1)
 					return false;
 
@@ -58,12 +60,6 @@ namespace BarcodeLabelPrinting.Models
 				orders = RowsToOrders(rows);
 
 				return true;
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e.Message);//log
-				return false;
-			}
 		}
 		private static List<Order> RowsToOrders(List<InputTableRow> rows)
 		{
@@ -72,7 +68,7 @@ namespace BarcodeLabelPrinting.Models
 			{
 				var order = new Order();
 				var row = gr.First();
-
+				
 				order.AddresseesContact = row.AddresseesContact;
 				order.AddresseesAddress = row.AddresseesAddress;
 				order.AddresseesTelephoneNumber = row.AddresseesTelephoneNumber;
@@ -97,7 +93,7 @@ namespace BarcodeLabelPrinting.Models
 					orderItem.Ean = item.ItemEan;
 					orderItem.Size = item.ItemSize;
 					orderItem.Count = item.ItemCount;
-					orderItem.TotalPrice = item.ItemPrice * item.ItemCount * (order.Nds/100+1);
+					orderItem.ItemDAD = item.ItemDAD;
 
 					order.Items.Add(orderItem);
 				}
@@ -107,9 +103,14 @@ namespace BarcodeLabelPrinting.Models
 		}
 		private static ICollection<InputTableRow> parseCsv(HttpPostedFileBase file)
 		{
-			using (var reader = new StreamReader(file.InputStream))
+			using (var reader = new StreamReader(file.InputStream,Encoding.GetEncoding("windows-1251")))
 			{
-				using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+				var config = new CsvConfiguration(CultureInfo.GetCultureInfo("ru-RU"))
+				{
+					Delimiter = ";",
+					Encoding = Encoding.GetEncoding("windows-1251"),
+				};
+				using (var csv = new CsvReader(reader, config))
 				{
 					return csv.GetRecords<InputTableRow>().ToList();
 				}
