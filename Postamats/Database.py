@@ -75,8 +75,8 @@ class Database(object):
 
         return obj
 
-    def ClearDataBase(self):
-        query = f"TRUNCATE TABLE {self.tableName}"
+    def ClearDataBase(self, pvz_id):
+        query = f"DELETE FROM {self.tableName} WHERE [pvz_id] = '{pvz_id}'"
         cursor = self.conn.cursor()
         cursor.execute(query)
         return cursor
