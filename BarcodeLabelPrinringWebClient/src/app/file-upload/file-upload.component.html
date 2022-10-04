@@ -1,0 +1,20 @@
+<div class="load" [hidden]="!InProgress">
+  <mat-spinner></mat-spinner>
+  <p>В данный момент происходит обработка файла и генерация этикеток
+    Обычно это занимает 2 минуты для 5000 строк</p>
+</div>
+
+
+<form class="upload-file-form" [style.width.px]="width" [hidden]="InProgress">
+  <mat-form-field class="full-width">
+    <mat-label>{{inputLabel}}</mat-label>
+    <input [disabled]="true" matInput type="text" [(ngModel)]="path" name="path">
+    <mat-hint align="start" class="mat-small"><a href="./assets/Example.csv" target="_blank">{{underInputText}}</a>
+    </mat-hint>
+  </mat-form-field>
+  <input type="file" style="display: none" #fileInput [accept]="filter"
+    (input)="onChangeFileInput($event, fileInput)" />
+  <button mat-raised-button color="accent" class="full-width" type="file"
+    (click)="onClickFileInputButton()">{{buttonText}}</button>
+  <mat-checkbox [(ngModel)]="mergeFiles" name="mergeFiles">Объединять этикетки</mat-checkbox>
+</form>

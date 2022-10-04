@@ -1,0 +1,10 @@
+@import '../../lr-theme.scss';  
+:host {
+    z-index: 20;
+  }
+.mat-toolbar{
+    height: 55px;
+    padding-top: 10px;
+    background: $lr-primary-color;
+    padding-bottom: 10px;
+}
