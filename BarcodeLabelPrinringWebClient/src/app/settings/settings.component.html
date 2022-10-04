@@ -1,0 +1,13 @@
+<div class="title">
+    <a color="black" routerLink="/upload" routerLinkActive="active-link" (click)="goBack()" mat-icon-button aria-label="Назад">
+        <mat-icon>reply</mat-icon>
+    </a>
+    <span>Настройки</span>
+</div>
+<form class="form full-width">
+    <mat-form-field  appearance="fill">
+      <mat-label>Текст для накладной</mat-label>
+      <textarea matInput placeholder="Текст" [(ngModel)]="underInvoiceText" name="underInvoiceText" (change)="onChaged($event)"></textarea>
+    </mat-form-field>
+    <p class="additional-text">Изменения сохраняются автоматически</p>
+  </form>
