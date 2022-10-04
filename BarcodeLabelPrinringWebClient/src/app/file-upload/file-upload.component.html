@@ -2,8 +2,11 @@
   <mat-form-field class="full-width">
     <mat-label>{{inputLabel}}</mat-label>
     <input [disabled]="true" matInput type="text" [(ngModel)]="path" name="path">
-    <mat-hint align="start" class="mat-small">{{underInputText}} </mat-hint>
+    <mat-hint align="start" class="mat-small" (click)="onClickDownloadPreset($event, fileInput)">{{underInputText}}
+    </mat-hint>
   </mat-form-field>
-  <input type="file" style="display: none" #fileInput [accept]="filter" (input)="onChangeFileInput($event, fileInput)" />
-  <button mat-raised-button color="accent" class="full-width" type="file" (click)="onClickFileInputButton()">{{buttonText}}</button>
+  <input type="file" style="display: none" #fileInput [accept]="filter"
+    (input)="onChangeFileInput($event, fileInput)" />
+  <button mat-raised-button color="accent" class="full-width" type="file"
+    (click)="onClickFileInputButton()">{{buttonText}}</button>
 </form>

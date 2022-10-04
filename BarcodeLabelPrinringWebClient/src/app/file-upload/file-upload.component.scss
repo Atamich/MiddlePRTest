@@ -13,13 +13,46 @@
 
     .mat-hint {
         text-decoration: underline;
+        cursor: pointer;
     }
 }
 
 ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label {
     color: #ababab;
-  }
+}
 
 ::ng-deep .mat-form-field-underline {
     background-color: black !important;
+}
+[hidden] { display: none !important;}
+
+.loader {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    margin-left: -25px;
+}
+
+.loader-wheel {
+    animation: b2bspin 1s infinite linear;
+    border: 2px solid rgba(30, 30, 30, 0.5);
+    border-left: 4px solid #fff;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    margin-bottom: 10px;
+    margin-left: 50px;
+}
+
+@keyframes b2bspin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

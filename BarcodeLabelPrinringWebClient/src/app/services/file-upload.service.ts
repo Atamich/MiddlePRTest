@@ -28,4 +28,13 @@ export class FileUploadService<T = any> {
     }
     this.returnContent = result.content;
   }
+
+  async donwloadPreset(route: string, fileName :string = "") {
+
+
+    const result = await this.api.download<ResultModel<T>>(route, fileName);
+    
+
+    this.returnContent = result.content;
+  }
 }

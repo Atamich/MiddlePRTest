@@ -17,9 +17,10 @@ export class FileUploadComponent implements OnInit {
   @Input() buttonText: string
   @Input() filter: string = "*";
   @Input() route: string;
-
+  @Input() exampleFileRoute: string;
   afterDownload: boolean = true;
   @Input() fileName: string = ""
+  @Input() exampleFileName: string = ""
   // @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>()
   path = '';
   @ViewChild('fileInput')
@@ -29,24 +30,27 @@ export class FileUploadComponent implements OnInit {
 
   isProcess: boolean = false;
 
+  async onClickDownloadPreset(event: any, control: any) {
+     await this.service.donwloadPreset(this.exampleFileRoute, this.exampleFileName);
+  }
+
   onClickFileInputButton(): void {
     this.fileInput.nativeElement.click();
   }
 
   async onChangeFileInput(event: any, control: any) {
+
     const files: { [key: string]: File } = this.fileInput.nativeElement.files;
     this.file = files[0];
     this.path = this.file.name;
+    this.fileInput.nativeElement.value = "";
 
     await this.uploadFile();
+
   }
 
   async uploadFile() {
-    this.isProcess = true;
     await this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName);
-
-
-    this.isProcess = false;
   }
 
   constructor(public service: FileUploadService) { }
