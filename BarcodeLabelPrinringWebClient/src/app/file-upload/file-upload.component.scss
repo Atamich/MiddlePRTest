@@ -1,0 +1,25 @@
+.upload-file-form {
+    display: flex;
+
+    .mat-form-field {
+        padding: 5px;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+
+    button {
+        margin: auto;
+    }
+
+    .mat-hint {
+        text-decoration: underline;
+    }
+}
+
+::ng-deep .mat-form-field-appearance-legacy .mat-form-field-label {
+    color: #ababab;
+  }
+
+::ng-deep .mat-form-field-underline {
+    background-color: black !important;
+}

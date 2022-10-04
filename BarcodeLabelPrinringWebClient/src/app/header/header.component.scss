@@ -1,0 +1,8 @@
+@import '../../styles.scss';  
+
+.mat-toolbar{
+    max-height: 55px;
+    padding-top: 10px;
+    background: $lr-primary-color;
+    padding-bottom: 10px;
+}

@@ -1,0 +1,8 @@
+<form class="upload-file-form" [style.width.px]="width">
+  <mat-form-field class="full-width">
+    <mat-label>{{inputLabel}}</mat-label>
+    <input [disabled]="true" matInput>
+    <mat-hint align="start" class="mat-small">{{underInputText}} </mat-hint>
+  </mat-form-field>
+  <button mat-raised-button color="accent" class="full-width">{{buttonText}}</button>
+</form>
