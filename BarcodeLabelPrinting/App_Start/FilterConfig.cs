@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace BarcodeLabelPrinring
+namespace BarcodeLabelPrinting
 {
 	public class FilterConfig
 	{

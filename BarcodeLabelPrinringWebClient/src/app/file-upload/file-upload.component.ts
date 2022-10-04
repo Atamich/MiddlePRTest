@@ -17,10 +17,13 @@ export class FileUploadComponent implements OnInit {
   @Input() buttonText: string
   @Input() filter: string = "*";
   @Input() route: string;
+
+  afterDownload: boolean = true;
+  @Input() fileName: string = ""
   // @Output() dataChanged: EventEmitter<any> = new EventEmitter<any>()
   path = '';
   @ViewChild('fileInput')
-  fileInput : ElementRef;
+  fileInput: ElementRef;
 
   file: File;
 
@@ -40,14 +43,16 @@ export class FileUploadComponent implements OnInit {
 
   async uploadFile() {
     this.isProcess = true;
-    await this.service.uploadFile(this.file,this.route); // переименовать 
+    await this.service.uploadFile(this.file, this.route, this.afterDownload, this.fileName);
+
+
     this.isProcess = false;
   }
 
   constructor(public service: FileUploadService) { }
 
   async ngOnInit() {
-    
+
   }
 
 }

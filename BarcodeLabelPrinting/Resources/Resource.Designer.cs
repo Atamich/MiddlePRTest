@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BarcodeLabelPrinring.Resources {
+namespace BarcodeLabelPrinting.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BarcodeLabelPrinring.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BarcodeLabelPrinring.Resources.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BarcodeLabelPrinting.Resources.Resource", typeof(Resource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,20 @@ namespace BarcodeLabelPrinring.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name,Article,Ean,Size,Price,Count,TotalPrice
+        ///Табуретка, 111111, 122464576, единный размер, 2000.30, 3
+        ///Шапка, 222222, 7345623423, единный размер, 2000.30, 3
+        ///Сапоги, 333333, 12333333376, 48-50, 2500.30, 3
+        ///
+        ///.
+        /// </summary>
+        public static string Example {
+            get {
+                return ResourceManager.GetString("Example", resourceCulture);
             }
         }
         

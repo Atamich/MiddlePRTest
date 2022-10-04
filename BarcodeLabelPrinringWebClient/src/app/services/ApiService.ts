@@ -27,10 +27,31 @@ export class ApiService {
     }).catch();
   }
 
+  post<T>(url: string, body: any): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.http.post<T>(this.baseAddress + url, body).subscribe(
+        response => resolve(response),
+        error => this.errorHandler(error, reject)
+      );
+    }).catch();
+  }
+
+  async uploadAndDownload<T>(url: string, body: any, name: string) {
+    return new Promise<T>((resolve, reject) => {
+      this.http.post(this.baseAddress + url, body, {
+        responseType: "blob"
+      }).subscribe(
+        response => {
+          this.downloadFile(response, name);
+        },
+        error => this.errorHandler(error, reject)
+      );
+    }).catch();
+  }
+
   async download<T>(url: string, name: string) {
     return new Promise<T>((resolve, reject) => {
       this.http.get(this.baseAddress + url, {
-        headers: new HttpHeaders().set("Authorization", "Bearer " + this.token),
         responseType: "blob"
       }).subscribe(
         response => {
@@ -42,7 +63,7 @@ export class ApiService {
   }
 
   private downloadFile(data: any, name: string) {
-    console.log(typeof(data), data);
+    console.log(typeof (data), data);
     const downloadedFile = new Blob([data], { type: data.type });
     const a = document.createElement('a');
     a.setAttribute('style', 'display:none;');
@@ -60,14 +81,7 @@ export class ApiService {
     };
   }
 
-  post<T>(url: string, body: any): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      this.http.post<T>(this.baseAddress + url, body).subscribe(
-        response => resolve(response),
-        error => this.errorHandler(error, reject)
-      );
-    }).catch();
-  }
+
 
   put<T>(url: string, body: any): Promise<T> {
     return new Promise<T>((resolve, reject) => {
