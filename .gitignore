@@ -112,6 +112,9 @@ ipch/
 *.VC.db
 *.VC.VC.opendb
 
+#Angular
+.angular/
+
 # Visual Studio profiler
 *.psess
 *.vsp
