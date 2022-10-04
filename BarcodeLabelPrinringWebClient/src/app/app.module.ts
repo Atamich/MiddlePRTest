@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LayoutModule } from '@angular/cdk/layout';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,22 +26,20 @@ import { StartComponent } from './start/start.component';
 import { SettingsComponent } from './settings/settings.component';
 
 const customComponents = [
-  FileUploadComponent
+  FileUploadComponent,FooterComponent,HeaderComponent,SettingsComponent,StartComponent
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    customComponents,
-    HeaderComponent,
-    FooterComponent,
-    StartComponent,
-    SettingsComponent
+    customComponents
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     AppRoutingModule,
     LayoutModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     materialModules,
   ],
