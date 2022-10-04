@@ -22,13 +22,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Deliverers\YaDelivery.py" />
+    <Compile Include="Deliverers\_5PostApi.py" />
     <Compile Include="DeliveryAbsctract.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Database.py" />
     <Compile Include="PointData.py" />
     <Compile Include="Main.py" />
-    <Compile Include="_5PostApi.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env_postamats\">
@@ -40,6 +41,10 @@
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X64</Architecture>
     </Interpreter>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Deliverers\" />
+    <Folder Include="Deliverers\__pycache__\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
