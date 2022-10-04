@@ -24,6 +24,7 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { StartComponent } from './start/start.component';
 import { SettingsComponent } from './settings/settings.component';
+import { FinalComponent } from './final/final.component';
 
 const customComponents = [
   FileUploadComponent,FooterComponent,HeaderComponent,SettingsComponent,StartComponent
@@ -32,7 +33,8 @@ const customComponents = [
 @NgModule({
   declarations: [
     AppComponent,
-    customComponents
+    customComponents,
+    FinalComponent
   ],
   imports: [
     BrowserModule,

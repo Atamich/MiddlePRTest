@@ -188,6 +188,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\UploadTableController.cs" />
+    <Compile Include="Extensions\PdfSharpExtension.cs" />
+    <Compile Include="Extensions\StringExtestion.cs" />
     <Compile Include="Filters\FilterCors.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

@@ -1,6 +1,7 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { LiteEvent } from './LiteEvent';
 
 @Injectable({
@@ -12,7 +13,7 @@ export class ApiService {
 
   authError: LiteEvent<ApiService> = new LiteEvent<ApiService>();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   setToken(token: string) {
     this.token = token;
@@ -63,7 +64,6 @@ export class ApiService {
   }
 
   private downloadFile(data: any, name: string) {
-    console.log(typeof (data), data);
     const downloadedFile = new Blob([data], { type: data.type });
     const a = document.createElement('a');
     a.setAttribute('style', 'display:none;');
@@ -73,6 +73,7 @@ export class ApiService {
     a.target = '_blank';
     a.click();
     document.body.removeChild(a);
+    this.router.navigateByUrl("final");
   }
 
   getOptions() {

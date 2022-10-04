@@ -1,4 +1,5 @@
-﻿using BarcodeLabelPrinting.Interfaces;
+﻿using BarcodeLabelPrinting.Extensions;
+using BarcodeLabelPrinting.Interfaces;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Shapes;
 using MigraDoc.DocumentObjectModel.Tables;
@@ -20,11 +21,12 @@ namespace BarcodeLabelPrinting.Models
         public byte[] FileBytes { get; private set; }
         public string FileName { get; set; } = "Invoice.pdf";
 
-		readonly int[] colPositionsX = { 35, 120, 160, 215, 282, 340, 370 };
+		readonly int[] colPositionsX = { 25, 120, 160, 215, 282, 340, 370 };
 
         const int StartY = 160;
         const int rowSize = 10;
-        const int totalRecordsOnPage = 20;
+        const int rowMargTop = 5;
+		const int totalRecordsOnPage = 20;
         readonly XFont font = new XFont("Segoe WP", 7);
 
         private InvoicePdf() { }
@@ -48,14 +50,22 @@ namespace BarcodeLabelPrinting.Models
 					var orderItem = order.Items[i];
 
 					int xi = 0;
+					int biggestPropRow = 1;
 					foreach (var propItem in orderItem) // Отрисовка в разных позициях, реализация колонок
 					{
-						gfx.DrawString(propItem, font, XBrushes.Black,
-							colPositionsX[xi++],
-							y);
+						var list = propItem.WordWrap(25);
+						if (list.Count > biggestPropRow) biggestPropRow = list.Count;
+
+						for (int pr = 0; pr < list.Count; pr++)
+						{
+							gfx.DrawString(list[pr], font, XBrushes.Black,
+							colPositionsX[xi],
+							y+(pr*rowSize)+rowMargTop*i);
+						}
+						xi++;
 					}
 
-					y += rowSize;
+					y += rowSize* biggestPropRow;
 
 					if (i != 0 && i % totalRecordsOnPage == 0) //every 20 record adds new page
 					{
@@ -79,12 +89,7 @@ namespace BarcodeLabelPrinting.Models
 
 		private void DrawOrderInfo(XGraphics gfx, Order order)
 		{
-			List<string> list = WordWrap(order.AddresseesAddress, 25);
-			for (int i = 0; i < list.Count; i++)
-			{
-				string str = list[i];
-				gfx.DrawString(str, font, XBrushes.Black, 14, 48+i*10);
-			}
+			gfx.DrawWrappedString(order.AddresseesAddress,14,48,25,font);
 
 			gfx.DrawString(order.ClientId.ToString(), font, XBrushes.Black, 350, 45);
 			gfx.DrawString(order.OrderId.ToString(), font, XBrushes.Black, 350, 55);
@@ -93,29 +98,11 @@ namespace BarcodeLabelPrinting.Models
 			gfx.DrawString(order.BillType, font, XBrushes.Black, 350, 85);
 			gfx.DrawString(order.CurrencyType, font, XBrushes.Black, 350, 95);
 
-			gfx.DrawString(order.TotalPrice.ToString(), font, XBrushes.Black, 365, 336);
+			gfx.DrawString(order.TotalPrice.ToString("0.##"), font, XBrushes.Black, 365, 336);
 			gfx.DrawString(order.ServiceFee.ToString(), font, XBrushes.Black, 365, 346);
 
-			gfx.DrawString(order.TotalPrice.ToString(), font, XBrushes.Black, 365, 396);
+			gfx.DrawString(order.TotalPrice.ToString("0.##"), font, XBrushes.Black, 365, 396);
 			gfx.DrawString(order.Nds.ToString(), font, XBrushes.Black, 365, 407);
-		}
-
-		public static List<string> WordWrap(string text, int maxLineLength)
-		{
-			var list = new List<string>();
-			int currentIndex;
-			var lastWrap = 0;
-			var whitespace = new[] { ' ', '\r', '\n', '\t' };
-			do
-			{
-				currentIndex = lastWrap + maxLineLength > text.Length ? text.Length : (text.LastIndexOfAny(new[] { ' ', ',', '.', '?', '!', ':', ';', '-', '\n', '\r', '\t' }, Math.Min(text.Length - 1, lastWrap + maxLineLength)) + 1);
-				if (currentIndex <= lastWrap)
-					currentIndex = Math.Min(lastWrap + maxLineLength, text.Length);
-				list.Add(text.Substring(lastWrap, currentIndex - lastWrap).Trim(whitespace));
-				lastWrap = currentIndex;
-			} while (currentIndex < text.Length);
-
-			return list;
 		}
 
 		private static PdfPage GetInvoicePreset()

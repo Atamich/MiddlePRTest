@@ -25,9 +25,9 @@ namespace BarcodeLabelPrinting.Models
 			yield return Article.ToString();
 			yield return Ean.ToString();
 			yield return Size;
-			yield return Price.ToString();
+			yield return Price.ToString("0.##");
 			yield return Count.ToString();
-			yield return TotalPrice.ToString();
+			yield return TotalPrice.ToString("0.##");
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using BarcodeLabelPrinting.Interfaces;
+﻿using BarcodeLabelPrinting.Extensions;
+using BarcodeLabelPrinting.Interfaces;
 using PdfSharp.Drawing;
 using PdfSharp.Drawing.BarCodes;
 using PdfSharp.Pdf;
@@ -66,7 +67,7 @@ namespace BarcodeLabelPrinting.Models
 						w = 0;
 						h++;
 					}
-					if (h != 0 && h % rowsOnPage == 0) //new page
+					if (h != 0 && h % rowsOnPage == 0 && i != order.Items.Count-1) //new page
 					{
 						w = 0;
 						h = 0;
@@ -93,7 +94,7 @@ namespace BarcodeLabelPrinting.Models
 			var rowSize = rect.Height / 10;
 
 			gfx.DrawString(order.AddresseesContact.ToUpper(), font, XBrushes.Black, marginLeft, rect.Y + rowSize * 2);
-			gfx.DrawString(order.AddresseesAddress.ToUpper(), font, XBrushes.Black, marginLeft, rect.Y + rowSize * 3);
+			gfx.DrawWrappedString(order.AddresseesAddress.ToUpper(), marginLeft, rect.Y + rowSize * 3,60, font);
 
 			gfx.DrawString("Тел.: " + order.AddresseesTelephoneNumber, font, XBrushes.Black, marginLeft, rect.Y + rowSize * 5);
 			gfx.DrawString("La Redoute", font, XBrushes.Black, marginLeft, rect.Y + rowSize * 6);

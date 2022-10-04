@@ -16,6 +16,7 @@ export class FileUploadService<T = any> {
     let result: ResultModel<T>;
     if (afterDownload) {
       result = await this.api.uploadAndDownload<ResultModel<T>>(route, formData,fileName);
+      console.log('test');
     }
     else {
       result = await this.api.post<ResultModel<T>>(route, formData);
