@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LayoutModule } from '@angular/cdk/layout';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -25,6 +25,7 @@ import { FooterComponent } from './footer/footer.component';
 import { StartComponent } from './start/start.component';
 import { SettingsComponent } from './settings/settings.component';
 import { FinalComponent } from './final/final.component';
+import { WinAuthInterceptor } from './services/WinAuthService';
 
 const customComponents = [
   FileUploadComponent,FooterComponent,HeaderComponent,SettingsComponent,StartComponent
@@ -45,7 +46,12 @@ const customComponents = [
     BrowserAnimationsModule,
     materialModules,
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: WinAuthInterceptor,
+    multi: true
+}
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

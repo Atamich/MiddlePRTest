@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Web.Mvc;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method,
@@ -9,6 +10,8 @@ public class FilterCorsAttribute : FilterAttribute, IActionFilter
     private const string OutgoingOriginHeader = "Access-Control-Allow-Origin";
     private const string OutgoingMethodsHeader = "Access-Control-Allow-Methods";
     private const string OutgoingAgeHeader = "Access-Control-Max-Age";
+    private const string OutgoingAllowCredentials = "Access-Control-Allow-Credentials";
+    private readonly string FrontEndDomen = ConfigurationManager.AppSettings["frontEndDomen"];
 
     public void OnActionExecuted(ActionExecutedContext filterContext)
     {
@@ -17,19 +20,18 @@ public class FilterCorsAttribute : FilterAttribute, IActionFilter
 
     public void OnActionExecuting(ActionExecutingContext filterContext)
     {
-        //#if DEBUG
-        //#else
         var isLocal = filterContext.HttpContext.Request.IsLocal;
         var originHeader =
              filterContext.HttpContext.Request.Headers.Get(IncomingOriginHeader);
         var response = filterContext.HttpContext.Response;
 
         if (!String.IsNullOrWhiteSpace(originHeader) &&
-            (isLocal || IsAllowedOrigin(originHeader)))
+            (isLocal || originHeader.Equals(FrontEndDomen)))
         {
-            response.AddHeader(OutgoingOriginHeader, "*");
+            response.AddHeader(OutgoingOriginHeader, FrontEndDomen);
             response.AddHeader(OutgoingMethodsHeader, "GET,POST,OPTIONS");
             response.AddHeader(OutgoingAgeHeader, "3600");
+            response.AddHeader(OutgoingAllowCredentials, "true");
         }
         else
         {
@@ -42,33 +44,6 @@ public class FilterCorsAttribute : FilterAttribute, IActionFilter
                 filterContext.HttpContext.Response.StatusCode = 403;
                 filterContext.Result = new EmptyResult();
             }
-        }
-        //#endif
-    }
-
-    protected bool IsAllowedOrigin(string origin)
-    {
-        if(origin.Equals("https://www.laredoute.ru") ||
-           origin.Equals("http://www.laredoute.ru") ||
-           origin.Equals("https://m.laredoute.ru") ||
-           origin.Equals("http://m.laredoute.ru") ||
-           origin.Equals("https://preview.laredoute.ru") ||
-           origin.Equals("http://preview.laredoute.ru") ||
-           origin.Equals("http://preprod.laredoute.ru") ||
-           origin.Equals("https://preprod.laredoute.ru") ||
-           origin.Equals("https://m-preview.laredoute.ru") ||
-           origin.Equals("http://m-preview.laredoute.ru") ||
-           origin.Equals("http://www.laredoute.su") ||
-           origin.Equals("https://www.laredoute.su:8443") ||
-           origin.Equals("https://www.laredoute.su") ||
-           origin.Equals("https://www2.laredoute.ru") ||
-           origin.Equals("http://www2.laredoute.ru"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
         }
     }
 }

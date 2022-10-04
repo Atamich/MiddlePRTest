@@ -7,9 +7,10 @@ using System.Web.Mvc;
 
 namespace BarcodeLabelPrinting.Controllers
 {
-    //[RoutePrefix("authorize")]
-    [RoutePrefix("api/authorize")]
-    public class AuthorizeController : Controller
+	[RoutePrefix("authorize")]
+	//[RoutePrefix("api/authorize")]
+	[AllowAnonymous]
+	public class AuthorizeController : Controller
     {
         [Route("win")]
         [HttpGet]
